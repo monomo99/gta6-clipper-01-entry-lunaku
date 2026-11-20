@@ -64,13 +64,11 @@ mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 # -> out/VIDEO.json
 ```
 
-`VIDEO.json` currently holds a placeholder Shorts URL; the gate refuses a
-placeholder. After the clip is uploaded to YouTube, replace the URL with the
-real public Shorts URL, re-run the program, and submit.
+`VIDEO.json` holds the real public Shorts URL (https://www.youtube.com/shorts/LLQeKd0jRO8, published 20 Nov 2026 on @lunakuclips). `main.ts` validates the URL before copying it — a placeholder is refused.
 
 ## Files
 
 - `main.ts` — the program (copies VIDEO.json to the output dir).
-- `VIDEO.json` — the YouTube Shorts URL (placeholder until upload).
+- `VIDEO.json` — the published YouTube Shorts URL.
 - `README.md` — this file.
 - `LICENSE` — MIT.
