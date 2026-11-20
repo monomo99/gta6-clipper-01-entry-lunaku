@@ -4,8 +4,10 @@
 // with the bounty's line and your play code in its description, VIDEO.json names the video, and the house reads the
 // video's views from YouTube. Nothing this program writes about the video is scored.
 //
-// VIDEO.json names the published Short (https://www.youtube.com/shorts/LLQeKd0jRO8, public on @lunakuclips
-// since 20 Nov 2026). Before copying, the program validates the URL: it must be a real YouTube Shorts or
+// VIDEO.json names the published Short (https://www.youtube.com/shorts/z1I1NrRWdKc, public on @lunakuclips
+// since 20 Nov 2026): rebuild-1 v3, the full-bleed 0:53 cut of the Trailer 2 prison-reunion stretch
+// (Jason waits at the gate, Lucia walks out, then the escalation) with the make.fun pitch end card.
+// Before copying, the program validates the URL: it must be a real YouTube Shorts or
 // video address, and a leftover placeholder (anything still containing "<id>") is refused loudly, so a
 // placeholder can never reach the gate by accident.
 //
@@ -52,12 +54,16 @@ try {
 }
 
 const host = parsed.hostname.replace(/^www\./, '');
-const isShorts = host === 'youtube.com' && /^\/shorts\/[A-Za-z0-9_-]{6,}$/.test(parsed.pathname);
-const isWatch = host === 'youtube.com' && parsed.pathname === '/watch' && /^[A-Za-z0-9_-]{6,}$/.test(parsed.searchParams.get('v') ?? '');
-const isShortLink = host === 'youtu.be' && /^\/[A-Za-z0-9_-]{6,}$/.test(parsed.pathname);
+// Per the kit RULES, a YouTube video id is exactly 11 characters ([A-Za-z0-9_-]); a shorter or
+// longer id can never be a real video, so it is refused here instead of reaching the gate.
+const ID_11 = /^[A-Za-z0-9_-]{11}$/;
+const isShorts = host === 'youtube.com' && /^\/shorts\/[A-Za-z0-9_-]{11}$/.test(parsed.pathname);
+const isWatch = host === 'youtube.com' && parsed.pathname === '/watch' && ID_11.test(parsed.searchParams.get('v') ?? '');
+const isShortLink = host === 'youtu.be' && ID_11.test(parsed.pathname.slice(1));
 if (!isShorts && !isWatch && !isShortLink) {
   fail(`VIDEO.json holds a URL that is not a YouTube Shorts/video address: ${url}`);
 }
+const videoId = isShorts ? parsed.pathname.split('/')[2] : isWatch ? (parsed.searchParams.get('v') ?? '') : parsed.pathname.slice(1);
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 try {
@@ -75,4 +81,4 @@ try {
 if (copied !== raw) {
   fail('VIDEO.json copy mismatch: the output does not match the input.');
 }
-console.log(`VIDEO.json validated and copied: ${url}`);
+console.log(`VIDEO.json validated and copied: ${url} (video id ${videoId})`);
